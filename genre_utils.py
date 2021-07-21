@@ -2,31 +2,28 @@ import eyed3
 import os
 import pickle
 from mutagen.easyid3 import EasyID3
+from mutagen.id3 import ID3NoHeaderError
 from general_utils import unique_list
 
 
 def read_genres(folder):
-    # all_genres = []
     genre_map = {}
     for subdir, dirs, files in os.walk(folder):
         if not dirs:  # album directory
             album_genres = []
             for f in files:
-                audiofile = eyed3.load(os.path.join(subdir, f))
-                if audiofile and audiofile.info != None:
-                    if not audiofile.tag.genre:
-                        album_genres += ['']
-                    else:
-                        album_genres += audiofile.tag.genre.name.split('/')
+                try:
+                    audio = EasyID3(os.path.join(subdir, f))
+                except ID3NoHeaderError:
+                    continue
+                for g in audio['genre']:
+                    album_genres += g.split('/')
             album_genres = unique_list(album_genres)
             if album_genres == []:
                 album_genres = ['']
-            # all_genres += album_genres
             genre_map[subdir] = album_genres
-    # all_genres = unique_list(all_genres)
-    # for album, genre in genre_map.items():
-    #     print(album + " -> " + str(genre))
-    # print(all_genres)
+    for album, genre in genre_map.items():
+        print(album + " -> " + str(genre))
     return genre_map
 
 
@@ -57,23 +54,20 @@ def replace_genres(lib_genres, corrections):
         print("Replacing genre in ", album)
         print("\t",genres,"--->",genre_str)
         for file in os.listdir(album):
-            if file.endswith(".mp3") or file.endswith(".mp4") or file.endswith(".wav") or file.endswith(".m4a"):
+            try:
                 audio = EasyID3(os.path.join(album, file))
-                if audio:
-                    audio['genre'] = genre_str
-                    audio.save()
-            # audiofile = eyed3.load(os.path.join(album, file))
-            # if audiofile and audiofile.info != None:
-            #     audiofile.tag._setGenre(genre_str)
-            #     audiofile.tag.save()
+            except ID3NoHeaderError:
+                continue
+            audio['genre'] = genre_str
+            audio.save()
     return
 
 
 def update_genre(rootdir, corrections):
-    # lib_genres = read_genres(rootdir)
-    # with open('lib_genres.pickle', 'wb') as handle:
-    #     pickle.dump(lib_genres, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    with open('lib_genres.pickle', 'rb') as handle:
-        lib_genres = pickle.load(handle)
-    replace_genres(lib_genres, corrections)
+    lib_genres = read_genres(rootdir)
+    with open('lib_genres.pickle', 'wb') as handle:
+        pickle.dump(lib_genres, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('lib_genres.pickle', 'rb') as handle:
+    #     lib_genres = pickle.load(handle)
+    # replace_genres(lib_genres, corrections)
 
