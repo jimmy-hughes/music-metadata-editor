@@ -16,6 +16,10 @@ def read_genres(folder):
                     audio = EasyID3(os.path.join(subdir, f))
                 except ID3NoHeaderError:
                     continue
+                try:
+                    audio['genre']
+                except KeyError:
+                    continue
                 for g in audio['genre']:
                     album_genres += g.split('/')
             album_genres = unique_list(album_genres)
@@ -64,10 +68,10 @@ def replace_genres(lib_genres, corrections):
 
 
 def update_genre(rootdir, corrections):
-    lib_genres = read_genres(rootdir)
-    with open('lib_genres.pickle', 'wb') as handle:
-        pickle.dump(lib_genres, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    # with open('lib_genres.pickle', 'rb') as handle:
-    #     lib_genres = pickle.load(handle)
-    # replace_genres(lib_genres, corrections)
+    # lib_genres = read_genres(rootdir)
+    # with open('lib_genres.pickle', 'wb') as handle:
+    #     pickle.dump(lib_genres, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('lib_genres.pickle', 'rb') as handle:
+        lib_genres = pickle.load(handle)
+    replace_genres(lib_genres, corrections)
 
