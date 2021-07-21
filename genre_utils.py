@@ -1,6 +1,7 @@
 import eyed3
 import os
 import pickle
+from mutagen.easyid3 import EasyID3
 from general_utils import unique_list
 
 
@@ -55,10 +56,14 @@ def replace_genres(lib_genres, corrections):
         print("Replacing genre in ", album)
         print("\t",genres,"--->",genre_str)
         for file in os.listdir(album):
-            audiofile = eyed3.load(os.path.join(album, file))
-            if audiofile and audiofile.info != None:
-                audiofile.tag._setGenre(genre_str)
-                audiofile.tag.save()
+            audio = EasyID3(os.path.join(album, file))
+            if audio:
+                audio['genre'] = genre_str
+                audio.save()
+            # audiofile = eyed3.load(os.path.join(album, file))
+            # if audiofile and audiofile.info != None:
+            #     audiofile.tag._setGenre(genre_str)
+            #     audiofile.tag.save()
     return
 
 
