@@ -42,7 +42,8 @@ def replace_genres(lib_genres, corrections):
 
         if genres == new_genres:
             continue
-        new_genres.remove('')
+        if '' in new_genres:
+            new_genres.remove('')
         if len(new_genres) == 0:
             print("WARNING: No Genres defined for ", album)
             genre_str = ''
@@ -68,10 +69,10 @@ def replace_genres(lib_genres, corrections):
 
 
 def update_genre(rootdir, corrections):
-    lib_genres = read_genres(rootdir)
-    with open('lib_genres.pickle', 'wb') as handle:
-        pickle.dump(lib_genres, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    # with open('lib_genres.pickle', 'rb') as handle:
-    #     lib_genres = pickle.load(handle)
+    # lib_genres = read_genres(rootdir)
+    # with open('lib_genres.pickle', 'wb') as handle:
+    #     pickle.dump(lib_genres, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('lib_genres.pickle', 'rb') as handle:
+        lib_genres = pickle.load(handle)
     replace_genres(lib_genres, corrections)
 
