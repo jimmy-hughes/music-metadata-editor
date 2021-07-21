@@ -57,10 +57,11 @@ def replace_genres(lib_genres, corrections):
         print("Replacing genre in ", album)
         print("\t",genres,"--->",genre_str)
         for file in os.listdir(album):
-            audio = EasyID3(os.path.join(album, file))
-            if audio:
-                audio['genre'] = genre_str
-                audio.save()
+            if file.endswith(".mp3") or file.endswith(".mp4") or file.endswith(".wav") or file.endswith(".m4a"):
+                audio = EasyID3(os.path.join(album, file))
+                if audio:
+                    audio['genre'] = genre_str
+                    audio.save()
             # audiofile = eyed3.load(os.path.join(album, file))
             # if audiofile and audiofile.info != None:
             #     audiofile.tag._setGenre(genre_str)
