@@ -1,5 +1,6 @@
 import eyed3
 import os
+import pickle
 from general_utils import unique_list
 
 
@@ -63,5 +64,9 @@ def replace_genres(lib_genres, corrections):
 
 def update_genre(rootdir, corrections):
     lib_genres = read_genres(rootdir)
+    with open('lib_genres.pickle', 'wb') as handle:
+        pickle.dump(lib_genres, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('lib_genres.pickle', 'rb') as handle:
+    #     lib_genres = pickle.load(handle)
     replace_genres(lib_genres, corrections)
 
